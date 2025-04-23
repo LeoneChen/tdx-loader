@@ -63,14 +63,16 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
 
 # Install NASM
 ENV NASM_VERSION=2.15.05
-RUN wget -P /tmp --no-check-certificate https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.bz2 \
-    && cd /tmp && tar xjvf /tmp/nasm-$NASM_VERSION.tar.bz2 \
-    && cd /tmp/nasm-$NASM_VERSION \
+RUN apt-get install -y autoconf asciidoc xmlto
+RUN wget -P /tmp --no-check-certificate https://github.com/netwide-assembler/nasm/archive/refs/tags/nasm-$NASM_VERSION.tar.gz \
+    && cd /tmp && tar xzvf /tmp/nasm-$NASM_VERSION.tar.gz \
+    && cd /tmp/nasm-nasm-$NASM_VERSION \
     && ./autogen.sh \
     && ./configure --prefix="/opt" --bindir="/usr/bin" \
-    && make \
+    && make -j$(nproc) \
+    && touch nasm.1 ndisasm.1 \
     && make install \
-    && rm -rf /tmp/nasm-$NASM_VERSION.*
+    && rm -rf /tmp/nasm-nasm-$NASM_VERSION.*
 
 # Install Python3
 RUN apt install -y build-essential checkinstall \
